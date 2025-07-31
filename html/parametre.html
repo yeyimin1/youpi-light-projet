@@ -24,7 +24,7 @@
             <button>Réglage de l'heure</button>
             <article>
                 <h3>Modifier les informations du wifi</h3>
-                <form action="">
+                <form action="" id="wifi-form">
                     <label for="ssid">SSID</label>
                     <input type="text" required placeholder="Nom du wifi" id="ssid">
                     <label for="password">PASSWORD</label>
@@ -35,8 +35,10 @@
             <article>
                 <h3>Réglage de l'heure</h3>
                 <label for="heure">Heure</label>
-                <input type="time" required placeholder="17:17" id="time">
+                <input type="time" placeholder="17:17" id="time" required>
+                <button type="submit">Régler</button>
             </article>
     </main>
+    <script src="../js/parametre.js"></script>
 </body>
 </html>
