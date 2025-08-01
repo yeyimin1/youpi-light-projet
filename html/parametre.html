@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Paramètre</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header>
@@ -20,9 +21,9 @@
     </header>
     <main>
             <h2>Paramètre</h2>
-            <button>Modifier les informations du wifi</button>
-            <button>Réglage de l'heure</button>
-            <article style="display: none;" class="modal">
+            <button id="wifi-btn-modify">Modifier les informations du wifi</button>
+            <button id="time-btn-modify">Réglage de l'heure</button>
+            <article class="modal" id="wifiSection">
                 <h3>Modifier les informations du wifi</h3>
                 <form action="" id="wifi-form">
                     <label for="ssid">SSID</label>
@@ -32,7 +33,7 @@
                     <button type="submit">Modifier</button>
                 </form>
             </article>
-            <article style="display: none;" class="modal">
+            <article class="modal" id="timeSection">
                 <h3>Réglage de l'heure</h3>
                 <form action="" id="hour-form">
                     <label for="heure">Heure</label>
