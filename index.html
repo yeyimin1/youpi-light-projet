@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Acceuil</title>
 </head>
 <body>
     <header>
-         <h1>YOUPILIGHT</h1>
+        <h1>YOUPILIGHT</h1>
         <nav>
             <ul>
                 <li><a href="index.html">Accueil</a></li>
@@ -19,14 +19,21 @@
         </nav>
     </header>
     <main>
-            <h2>Acceuil</h2>
-            <p>Date et heure du système</p>
-            <span id="year">---</span>/ <span id="month">---</span> / <span id="day">---</span> <span id="hour">---</span> : <span id="minute">---</span> : <span id="seconde">---</span>
-            <p>Langue</p>
-            <p>version : <strong>1.0</strong></p>
+        <h2>Acceuil</h2>
+        <p>Date et heure du système</p>
+        <span id="year">---</span> / <span id="month">---</span> / <span id="day">---</span>
+        <span id="hour">---</span> : <span id="minute">---</span> : <span id="seconde">---</span>
+        <br>
+        <br>
+        <label for="langue">Choisissez votre langue :</label>
+        <select name="langue" id="langue">
+            <option value="fr" selected>Français</option>
+            <option value="en">Anglais</option>
+        </select>
+        <p>version : <strong>1.0.0</strong></p>
     </main>
     <footer>
-
     </footer>
+    <script src="/js/acceuil.js"></script>
 </body>
 </html>
