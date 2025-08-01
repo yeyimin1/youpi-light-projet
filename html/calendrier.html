@@ -1,50 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calendrier</title>
 </head>
 <body>
-    <header>
-         <h1>YOUPILIGHT</h1>
-        <nav>
-            <ul>
-                <li><a href="../index.html">Accueil</a></li>
-                <li><a href="manuel.html">Mode manuel</a></li>
-                <li><a href="calendrier.html">Mode calendrier</a></li>
-                <li><a href="journal.html">Fichier journal</a></li>
-                <li><a href="parametre.html">Paramètre</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-            <h2>Mode calendrier</h2>
-            <div>
-                <h3>Sortie 1</h3>
-                <article>
-                    <form action="" id="sortie-1-form">
-                        <label for="allumage">Allumage</label>
-                        <input type="time" placeholder="18:18" id="sortie-1-on_heure"  required>
-                        <label for="extinction">Extinction</label>
-                        <input type="time" placeholder="19:19" id="sortie-1-off_heure"  required>
-                        <button type="submit">Envoyer la tâche</button>
-                    </form>
-                </article>
-            </div>
-            <div>
-                <h3>Sortie 2</h3>
-                <article>
-                    <form action="" id="sortie-2-form">
-                        <label for="allumage">Allumage</label>
-                        <input type="time" placeholder="18:18" id="sortie-2-on_heure" required>
-                        <label for="extinction">Extinction</label>
-                        <input type="time" placeholder="19:19" id="sortie-2-off_heure" required>
-                        <button type="submit">Envoyer la tâche</button>
-                    </form>
-                </article>
-            </div>
-    </main>
-    <script src="../js/calendrier.js"></script>
+  <header>
+    <h1>YOUPILIGHT</h1>
+    <nav>
+      <ul>
+        <li><a href="../index.html">Accueil</a></li>
+        <li><a href="manuel.html">Mode manuel</a></li>
+        <li><a href="calendrier.html">Mode calendrier</a></li>
+        <li><a href="journal.html">Fichier journal</a></li>
+        <li><a href="parametre.html">Paramètre</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Mode calendrier</h2>
+<button type="button" id="btn-sortie-1">Sortie 1</button>
+<button type="button" id="btn-sortie-2">Sortie 2</button>
+    <!-- Sortie 1 -->
+<fieldset id="formulaire-sortie-1" style="display: none;">
+      <!-- ✅ Option indépendante de sauvegarde -->
+      <div>
+        <label for="save-sortie-1">
+          <input type="checkbox" id="save-sortie-1" />
+          Conserver l'état après coupure
+        </label>
+        <button type="button" id="btn-save-sortie-1">Appliquer sauvegarde</button>
+      </div>
+
+      <form id="sortie-1-form">
+        <label for="sortie-1-taches">Choisissez la tâche :</label>
+        <select id="sortie-1-taches" name="taches">
+          <option value="1">Tâche 1</option>
+          <option value="2">Tâche 2</option>
+        </select><br>
+
+        <label for="sortie-1-on_heure">Allumage</label>
+        <input type="time" id="sortie-1-on_heure" required />
+
+        <label for="sortie-1-off_heure">Extinction</label>
+        <input type="time" id="sortie-1-off_heure" required />
+
+        <button type="submit">Envoyer la tâche</button>
+      </form>
+    </fieldset>
+
+    <!-- Sortie 2 -->
+<fieldset id="formulaire-sortie-2" style="display: none;">      <legend>Sortie 2</legend>
+
+      <!-- ✅ Option indépendante de sauvegarde -->
+      <div>
+        <label for="save-sortie-2">
+          <input type="checkbox" id="save-sortie-2" />
+          Conserver l'état après coupure
+        </label>
+        <button type="button" id="btn-save-sortie-2">Appliquer sauvegarde</button>
+      </div>
+
+      <form id="sortie-2-form">
+        <label for="sortie-2-taches">Choisissez la tâche :</label>
+        <select id="sortie-2-taches" name="taches">
+          <option value="1">Tâche 1</option>
+          <option value="2">Tâche 2</option>
+        </select><br>
+
+        <label for="sortie-2-on_heure">Allumage</label>
+        <input type="time" id="sortie-2-on_heure" required />
+
+        <label for="sortie-2-off_heure">Extinction</label>
+        <input type="time" id="sortie-2-off_heure" required />
+
+        <button type="submit">Envoyer la tâche</button>
+      </form>
+    </fieldset>
+  </main>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const form1 = document.getElementById("formulaire-sortie-1");
+  const form2 = document.getElementById("formulaire-sortie-2");
+
+  // Cacher tout au démarrage (par sécurité)
+  form1.style.display = "none";
+  form2.style.display = "none";
+
+  // Boutons
+  document.getElementById("btn-sortie-1").addEventListener("click", () => {
+    form1.style.display = "block";
+    form2.style.display = "none";
+  });
+
+  document.getElementById("btn-sortie-2").addEventListener("click", () => {
+    form2.style.display = "block";
+    form1.style.display = "none";
+  });
+});
+
+</script>
+  <script src="../js/calendrier.js"></script>
 </body>
 </html>
