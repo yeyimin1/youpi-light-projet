@@ -3,24 +3,46 @@
  ****************************/
 
 const timeAPI = {
-    getTime: () => {
-        const now = new Date();
-        return {
-            heure: now.getHours(),
-            minute: now.getMinutes(),
-            seconde: now.getSeconds()
-        };
+    getTime: async () => {
+        // Utilisation de fetchESP pour récupérer l'heure
+        const response = await fetchESP('/api/time');
+        if (response) {
+            return {
+                heure: response.hours,
+                minute: response.minutes,
+                seconde: response.seconds
+            };
+        } else {
+            // Fallback local si l'ESP ne répond pas
+            const now = new Date();
+            return {
+                heure: now.getHours(),
+                minute: now.getMinutes(),
+                seconde: now.getSeconds()
+            };
+        }
     }
 };
 
 const dateAPI = {
-    getDate: () => {
-        const now = new Date();
-        return {
-            annee: now.getFullYear(),
-            mois: now.getMonth() + 1, // +1 car les mois commencent à 0 en JS
-            jour: now.getDate()
-        };
+    getDate: async () => {
+        // Utilisation de fetchESP pour récupérer la date
+        const response = await fetchESP('/api/date');
+        if (response) {
+            return {
+                annee: response.year,
+                mois: response.month,
+                jour: response.day
+            };
+        } else {
+            // Fallback local
+            const now = new Date();
+            return {
+                annee: now.getFullYear(),
+                mois: now.getMonth() + 1,
+                jour: now.getDate()
+            };
+        }
     }
 };
 
@@ -28,21 +50,32 @@ const dateAPI = {
  * API pour les Langues *
  ************************/
 
-// Langue par défaut
-
-  function verifierLangue() {
-    const select = document.getElementById("langue");
-    const langueChoisie = select.value;
-
-    if (langueChoisie === "fr") {
-      alert("Vous avez choisi : Français");
-      // ici tu peux charger le contenu en français par exemple
-    } else if (langueChoisie === "en") {
-      alert("You selected: English");
-      // ici tu peux charger le contenu en anglais
+const languageAPI = {
+    setLanguage: async (lang) => {
+        // Envoi de la préférence linguistique à l'ESP
+        await fetchESP('/api/language', { language: lang });
+        
+        // Récupération des traductions depuis l'ESP
+        const translations = await fetchESP(`/api/translations/${lang}`);
+        
+        return translations || {
+            'fr': {
+                welcome: 'Bienvenue',
+                date: 'Date',
+                time: 'Heure',
+                language: 'Langue',
+                version: 'Version'
+            },
+            'en': {
+                welcome: 'Welcome',
+                date: 'Date',
+                time: 'Time',
+                language: 'Language',
+                version: 'Version'
+            }
+        }[lang];
     }
-  }
-
+};
 
 /************************
  * API pour la Version *
@@ -50,10 +83,8 @@ const dateAPI = {
 
 const versionAPI = {
     getVersion: async () => {
-        // Simulation de réponse API
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        return {
+        const response = await fetchESP('/api/version');
+        return response || {
             version: '1.0.2',
             releaseDate: '2023-11-15'
         };
@@ -66,10 +97,10 @@ const versionAPI = {
 
 async function initializePage() {
     // 1. Initialiser la date et l'heure
-    updateDateTime();
+    await updateDateTime();
     setInterval(updateDateTime, 1000);
     
-    // 2. Initialiser la langue (français par défaut)
+    // 2. Initialiser la langue
     const savedLang = localStorage.getItem('preferredLanguage') || 'fr';
     await changeLanguage(savedLang);
     
@@ -77,46 +108,36 @@ async function initializePage() {
     await displayVersion();
 }
 
-function updateDateTime() {
-    // Utilisation des API exactes comme demandé
-    const time = timeAPI.getTime();
-    const date = dateAPI.getDate();
-    
-    // Formatage
-    const timeStr = `${time.heure}:${time.minute}:${time.seconde}`;
-    const dateStr = `${date.annee}-${date.mois}-${date.jour}`;
-    
-    // Mise à jour du DOM
-    document.getElementById('system-time').textContent = timeStr;
-    document.getElementById('system-date').textContent = dateStr;
-}
-
-async function changeLanguage(lang) {
+async function updateDateTime() {
     try {
-        const translations = await languageAPI.setLanguage(lang);
+        const time = await timeAPI.getTime();
+        const date = await dateAPI.getDate();
         
-        // Mise à jour des textes
-        document.getElementById('welcome-text').textContent = translations.welcome;
-        document.getElementById('date-label').textContent = translations.date;
-        document.getElementById('time-label').textContent = translations.time;
-        document.getElementById('language-label').textContent = translations.language;
-        document.getElementById('version-label').textContent = translations.version;
+        const timeStr = `${time.heure}:${time.minute}:${time.seconde}`;
+        const dateStr = `${date.annee}-${date.mois}-${date.jour}`;
         
-        // Sauvegarde du choix
-        localStorage.setItem('preferredLanguage', lang);
+        document.getElementById('system-time').textContent = timeStr;
+        document.getElementById('system-date').textContent = dateStr;
     } catch (error) {
-        console.error("Erreur changement de langue:", error);
+        console.error("Erreur mise à jour date/heure:", error);
     }
 }
 
-async function displayVersion() {
+// 🔌 Fonction générique pour interagir avec l'ESP
+async function fetchESP(url, data = null) {
+    const options = data ? {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    } : { method: "GET" };
+
     try {
-        const versionInfo = await versionAPI.getVersion();
-        document.getElementById('version-number').textContent = versionInfo.version;
-        document.getElementById('version-date').textContent = versionInfo.releaseDate;
-    } catch (error) {
-        console.error("Erreur récupération version:", error);
-        document.getElementById('version-number').textContent = '1.0.0';
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`Erreur HTTP! ${response.status}`);
+        return await response.json();
+    } catch (err) {
+        console.error(`Erreur fetchESP (${url}):`, err);
+        return null;
     }
 }
 
@@ -126,5 +147,15 @@ async function displayVersion() {
 
 document.addEventListener('DOMContentLoaded', initializePage);
 
-document.getElementById('lang-fr').addEventListener('click', () => changeLanguage('fr'));
-document.getElementById('lang-en').addEventListener('click', () => changeLanguage('en'));
+// Gestion du sélecteur de langue
+document.getElementById("langue").addEventListener("change", function() {
+    const lang = this.value;
+    changeLanguage(lang);
+});
+
+// Fonction de vérification de langue (optionnelle)
+function verifierLangue() {
+    const select = document.getElementById("langue");
+    const langueChoisie = select.value;
+    changeLanguage(langueChoisie);
+}
