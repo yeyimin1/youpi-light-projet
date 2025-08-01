@@ -2,6 +2,7 @@ const ssidEl = document.getElementById("ssid");
 const passwordEL = document.getElementById("password");
 const timeEl = document.getElementById("time");
 const wifiEl = document.getElementById("wifi-form");
+const hourFormEl = document.getElementById('hour-form');
 
 if (!ssidEl || !passwordEL || !timeEl || !wifiEl) {
   console.error("L'élément n'existe pas dans le DOM");
@@ -73,7 +74,43 @@ wifiEl.addEventListener("submit", async (e) => {
   }
 });
 
-timeEl.addEventListener("submit", (e) => {
+hourFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
+    const url_time = "/setTime";
+   // console.log("Réglage");
+    //console.log(timeEl.value);
+   // console.log(typeof(timeEl.value));
+   try {
+    const responseData = await fetchESP(url_time,parseInput(timeEl));
+    if(!responseData) {
+        console.log("Aucune reponse du serveur")
+    }
+    if (responseData?.data) {
+      console.log("Données envoyées : ", responseData.data);
+    } else {
+      console.warn("Réponse inattendue du serveur :", responseData);
+    }
+   }
+   catch (err){
+    console.error("Erreur lors de l'envoi du réglage du temps",err);
+   }
+   finally {
+    hourFormEl.reset();
+   }
+
 })
+
+function parseInput(input) {
+    if(!input || input.value.trim() === "") {
+        console.error("Données invalides pour être parsé");
+        return;
+    }
+    const hour = parseInt(input.value.trim().split(':')[0],10);
+    const minute = parseInt(input.value.trim().split(':')[1],10);
+    const seconde = 0;
+    return {
+        heure : hour,
+        minute : minute,
+        seconde : seconde
+    };
+}
