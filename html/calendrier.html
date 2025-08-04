@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calendrier</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <header>
@@ -21,87 +22,41 @@
 
   <main>
     <h2>Mode calendrier</h2>
-<button type="button" id="btn-sortie-1">Sortie 1</button>
-<button type="button" id="btn-sortie-2">Sortie 2</button>
-    <!-- Sortie 1 -->
-<fieldset id="formulaire-sortie-1" style="display: none;">
-      <!-- ✅ Option indépendante de sauvegarde -->
-      <div>
-        <label for="save-sortie-1">
-          <input type="checkbox" id="save-sortie-1" />
-          Conserver l'état après coupure
-        </label>
-        <button type="button" id="btn-save-sortie-1">Appliquer sauvegarde</button>
-      </div>
-
-      <form id="sortie-1-form">
-        <label for="sortie-1-taches">Choisissez la tâche :</label>
-        <select id="sortie-1-taches" name="taches">
-          <option value="1">Tâche 1</option>
-          <option value="2">Tâche 2</option>
-        </select><br>
-
-        <label for="sortie-1-on_heure">Allumage</label>
-        <input type="time" id="sortie-1-on_heure" required />
-
-        <label for="sortie-1-off_heure">Extinction</label>
-        <input type="time" id="sortie-1-off_heure" required />
-
-        <button type="submit">Envoyer la tâche</button>
+    <label for="sorties">Sélectionnez la sortie :</label>
+    <select name="sortie" id="sorties">
+      <option value="1" selected>Sortie 1</option>
+      <option value="2">Sortie 2</option>
+    </select><br>
+    <label for="taches">Sélectionnez la tâche :</label>
+    <select name="tache" id="taches">
+      <option value="1" >Tâche 1</option>
+      <option value="2">Tâche 2</option>
+    </select>
+    <form id="sortie-form">
+      <fieldset>
+        <legend>Allumage</legend>
+        <label for="onTime">Heure -- Minute :</label>
+        <input type="time" id="onTime" required><br>
+      </fieldset>
+      <fieldset>
+        <legend>Extinction</legend>
+        <label for="offTime">Heure -- Minute : </label>
+        <input type="time" id="offTime" required>
+      </fieldset>
+      <button type="submit">Envoyer le réglage</button>
+    </form>
+    <section>
+      <form id="save-form">
+        <fieldset>
+          <legend>Sauvegarde</legend>
+          <label for="btn-save">
+            <span id="choice_state">---</span> la sauvegarde après coupure de <span id="selected-output">---</span>
+            <input type="checkbox" id="btn-save">
+          </label>
+          <button type="submit" id="sendChoice">Appliquer le changement</button>
+        </fieldset>
       </form>
-    </fieldset>
-
-    <!-- Sortie 2 -->
-<fieldset id="formulaire-sortie-2" style="display: none;">      <legend>Sortie 2</legend>
-
-      <!-- ✅ Option indépendante de sauvegarde -->
-      <div>
-        <label for="save-sortie-2">
-          <input type="checkbox" id="save-sortie-2" />
-          Conserver l'état après coupure
-        </label>
-        <button type="button" id="btn-save-sortie-2">Appliquer sauvegarde</button>
-      </div>
-
-      <form id="sortie-2-form">
-        <label for="sortie-2-taches">Choisissez la tâche :</label>
-        <select id="sortie-2-taches" name="taches">
-          <option value="1">Tâche 1</option>
-          <option value="2">Tâche 2</option>
-        </select><br>
-
-        <label for="sortie-2-on_heure">Allumage</label>
-        <input type="time" id="sortie-2-on_heure" required />
-
-        <label for="sortie-2-off_heure">Extinction</label>
-        <input type="time" id="sortie-2-off_heure" required />
-
-        <button type="submit">Envoyer la tâche</button>
-      </form>
-    </fieldset>
-  </main>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-  const form1 = document.getElementById("formulaire-sortie-1");
-  const form2 = document.getElementById("formulaire-sortie-2");
-
-  // Cacher tout au démarrage (par sécurité)
-  form1.style.display = "none";
-  form2.style.display = "none";
-
-  // Boutons
-  document.getElementById("btn-sortie-1").addEventListener("click", () => {
-    form1.style.display = "block";
-    form2.style.display = "none";
-  });
-
-  document.getElementById("btn-sortie-2").addEventListener("click", () => {
-    form2.style.display = "block";
-    form1.style.display = "none";
-  });
-});
-
-</script>
+    </section>
   <script src="../js/calendrier.js"></script>
 </body>
 </html>

@@ -1,3 +1,40 @@
+// --- Définition des URLs centralisées ---
+const apiUrls = {
+  setWifi: () => "/setInfos-wifi",
+  setTime: () => "/setTime"
+};
+
+// --- Fonctions spécialisées pour les requêtes API ---
+const api = {
+  async setWifiConfig(ssid, password) {
+    const url = apiUrls.setWifi();
+    const configData = {
+      ssid: ssid,
+      password: password
+    };
+    const response = await fetchESP(url, configData);
+    if (response?.data) {
+      console.log("Données envoyées pour le Wi-Fi : ", response.data);
+      return response.data;
+    }
+    console.warn("Réponse inattendue du serveur pour la configuration Wi-Fi :", response);
+    return null;
+  },
+
+  async setTime(timeData) {
+    const url = apiUrls.setTime();
+    const response = await fetchESP(url, timeData);
+    if (response?.data) {
+      console.log("Données envoyées pour l'heure : ", response.data);
+      return response.data;
+    }
+    console.warn("Réponse inattendue du serveur pour l'heure :", response);
+    return null;
+  }
+};
+// --- Reste de ton code (apiUrls, api, etc.) ---
+// ...
+
 const ssidEl = document.getElementById("ssid");
 const passwordEL = document.getElementById("password");
 const timeEl = document.getElementById("time");
@@ -7,115 +44,93 @@ const wifiBtn = document.getElementById("wifi-btn-modify");
 const timeBtn = document.getElementById("time-btn-modify");
 const wifiSection = document.getElementById('wifiSection');
 const timeSection = document.getElementById('timeSection');
+const modalSections = document.querySelectorAll('.modal'); // 💡 Sélectionne toutes les sections avec la classe 'modal'
+
 if (!ssidEl || !passwordEL || !timeEl || !wifiEl || !wifiBtn || !timeBtn || !timeSection || !wifiSection) {
-  console.error("L'élément n'existe pas dans le DOM");
-}
-// ⛱️ Masquer tout au départ
-wifiSection.style.display = "none";
-timeSection.style.display = "none";
+  console.error("Un ou plusieurs éléments n'existent pas dans le DOM. Le script ne peut pas continuer.");
+} else {
+  // ⛱️ Masquer tout au départ
+  modalSections.forEach(section => section.style.display = "none"); // 💡 Cache toutes les modales au début
 
-// 📌 Bouton Wifi
-wifiBtn.addEventListener("click", () => {
-  wifiSection.style.display = "block";
-});
-
-// 📌 Bouton Heure
-timeBtn.addEventListener("click", () => {
-  timeSection.style.display = "block";
-});
-
-// 📡 Événement sur la soumission du formulaire
-wifiEl.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const wifi_url = "/setInfos-wifi";
-  const ssid = ssidEl.value.trim();
-  const password = passwordEL.value.trim();
-
-  console.log("Données du formulaire :", ssid, password);
-
-  if (ssid === "" || password === "") {
-    console.error("La configuration est vide !");
-    return;
+  // Fonction utilitaire pour afficher une modale et cacher les autres
+  function showModal(modalToShow) {
+    modalSections.forEach(section => {
+      section.style.display = "none";
+    });
+    modalToShow.style.display = "block";
   }
 
-  const configData = {
-    ssid: ssid,
-    password: password
-  };
+  // 📌 Bouton Wi-Fi
+  wifiBtn.addEventListener("click", () => {
+    showModal(wifiSection);
+  });
 
-  try {
-    const responseData = await fetchESP(wifi_url, configData);
+  // 📌 Bouton Heure
+  timeBtn.addEventListener("click", () => {
+    showModal(timeSection);
+  });
 
-    if (!responseData) {
-      console.error("Aucune réponse du serveur");
+  // 📡 Événement sur la soumission du formulaire Wi-Fi
+  wifiEl.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const ssid = ssidEl.value.trim();
+    const password = passwordEL.value.trim();
+
+    if (ssid === "" || password === "") {
+      console.error("La configuration est vide !");
       return;
     }
-
-    if (responseData?.data) {
-      console.log("Données envoyées : ", responseData.data);
-    } else {
-      console.warn("Réponse inattendue du serveur :", responseData);
+    
+    const responseData = await api.setWifiConfig(ssid, password);
+    
+    if (!responseData) {
+      console.error("Échec de l'envoi de la configuration Wi-Fi.");
     }
-  } catch (err) {
-    console.error("Erreur lors de l'envoi de la configuration du wifi :", err);
-  }finally {
-  wifiEl.reset();
-  wifiSection.style.display = "none";
- // showToast("✅ Informations Wi-Fi mises à jour !");
-}
+    
+    wifiEl.reset();
+    wifiSection.style.display = "none";
+  });
 
-});
-
-hourFormEl.addEventListener("submit", async (e) => {
+  // ⏰ Événement sur la soumission du formulaire Heure
+  hourFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const url_time = "/setTime";
-   // console.log("Réglage");
-    //console.log(timeEl.value);
-   // console.log(typeof(timeEl.value));
-   try {
-    const responseData = await fetchESP(url_time,parseInput(timeEl));
-    if(!responseData) {
-        console.log("Aucune reponse du serveur")
-    }
-    if (responseData?.data) {
-      console.log("Données envoyées : ", responseData.data);
-    } else {
-      console.warn("Réponse inattendue du serveur :", responseData);
-    }
-   }
-   catch (err){
-    console.error("Erreur lors de l'envoi du réglage du temps",err);
-   }
- finally {
-  hourFormEl.reset();
-  timeSection.style.display = "none";
-  //showToast("✅ Heure réglée avec succès !");
-}
+    const timeData = parseInput(timeEl);
 
-})
-
-function parseInput(input) {
-    if(!input || input.value.trim() === "") {
-        console.error("Données invalides pour être parsé");
+    if (!timeData) {
+        console.error("Données de temps invalides. Le script ne peut pas continuer.");
         return;
     }
-    const hour = parseInt(input.value.trim().split(':')[0],10);
-    const minute = parseInt(input.value.trim().split(':')[1],10);
-    const seconde = 0;
-    return {
-        heure : hour,
-        minute : minute,
-        seconde : seconde
-    };
+    
+    const responseData = await api.setTime(timeData);
+    
+    if (!responseData) {
+      console.error("Échec de l'envoi de la configuration de l'heure.");
+    }
+    
+    hourFormEl.reset();
+    timeSection.style.display = "none";
+  });
 }
-// 🔌 Fonction générique pour interagir avec l’ESP
+// --- Reste de ton code (parseInput, fetchESP, etc.) ---
+
+function parseInput(input) {
+  if (!input || input.value.trim() === "") {
+    console.error("Données invalides pour être parsé");
+    return null; // Retourne null pour indiquer un échec
+  }
+  const [hour, minute] = input.value.trim().split(':').map(n => parseInt(n, 10));
+  return {
+    heure: hour,
+    minute: minute,
+    seconde: 0
+  };
+}
+
 async function fetchESP(url, data = null) {
   const options = data
     ? {
         method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify(data)
       }
     : { method: "GET" };
@@ -134,20 +149,3 @@ async function fetchESP(url, data = null) {
     return null;
   }
 }
-/*
-function showToast(message) {
-  let toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerText = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add("show");
-  }, 50);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 500);
-  }, 3000);
-}
-*/
